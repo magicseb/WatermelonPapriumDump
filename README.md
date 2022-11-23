@@ -4,20 +4,21 @@ https://github.com/ArcadeHustle/WatermelonPapriumDump/fork
 Big thanks to Fonzie for allowing this to be published.
 - written by hostile, with supporting information from the community at large!
 <p align="center">
-<img src="https://arcadehustle.github.io/WatermelonPapriumDump/images/FonzieWMProjectLittleMan.jpg">
+<img src="https://arcadehustle.github.io/WatermelonPapriumDump/images/FonzieWMProjectLittleMan.jpg" width="512" height="512">
 </p>
 
 * [Pseudo-Legal opinion](#pseudo-legal-opinion)
 * [Project Little Man](#project-little-man)
    * [Current Progress](#current-progress)
-      * [The lines between reference and inspiration, and swiping and plagiarism can be murky](#the-lines-between-reference-and-inspiration-and-swiping-and-plagiarism-can-be-murky)
-   * [DATENMEISTER DT128M16VA1LT](#datenmeister-dt128m16va1lt)
+      * [Paprium CSI](#paprium-csi)
+      * [Paprium Codes!](#paprium-codes)
+   * [Further exposure of the fake Datenmeister DT128M16VA1LT](#further-exposure-of-the-fake-datenmeister-dt128m16va1lt)
       * [DT128M16VA1LT parts related to data storage, and game logic.](#dt128m16va1lt-parts-related-to-data-storage-and-game-logic)
-         * [Intel® MAX 10 FPGAs](#intel-max-10-fpgas)
+         * [Intel® MAX 10 FPGA](#intel-max-10-fpga)
          * [STM32F4](#stm32f4)
       * [MirrorBit Flash](#mirrorbit-flash)
       * [i2c EEPROM](#i2c-eeprom)
-   * [Useful tools](#useful-tools)
+   * [Useful information &amp; tools](#useful-information--tools)
       * [Cart Specific detail](#cart-specific-detail)
          * [Megawire 4.0 (MW4.0)](#megawire-40-mw40)
          * [Exposed vias on rear of cart](#exposed-vias-on-rear-of-cart)
@@ -34,31 +35,9 @@ Big thanks to Fonzie for allowing this to be published.
       * [Support situation](#support-situation)
 
 # Pseudo-Legal opinion
-Additional text relevant to this document can be found below:<br>
-
-Exemptions to Prohibition against Circumvention of Technological Measures Protecting Copyrighted Works<br>
-Seventh Triennial Section 1201 Final Rule, Effective October 28, 2018 <br>
-https://library.osu.edu/document-registry/docs/1027/stream<br>
-"Video games in the form of computer programs, where outside server support has been discontinued, to allow individual play and preservation by an eligible library, archive, or museum"<br>
-
-https://library.osu.edu/site/copyright/2019/03/20/2018-dmca-section-1201-exemptions-announced/ <br>
-"Video games in the form of computer programs, lawfully acquired as complete games 37"<br> 
-"CFR §201.40(b)(12)"<br> 
-"For personal, local gameplay; or To allow preservation in a playable format..."<br>
-
-"Computer programs protected by dongles that prevent access due to malfunction or damage and which are obsolete. A dongle shall be considered obsolete if it is no longer manufactured or if a replacement or repair is no longer reasonably available in the commercial marketplace."<br>
-https://www.copyright.gov/fedreg/2006/71fr68472.html<br>
-
-"The final rule allows eligible libraries, archives, and museums to circumvent technological protection measures on certain lawfully acquired computer programs (including video games) to preserve computer programs and computer program-dependent materials."<br>
-https://clinic.cyber.harvard.edu/2018/10/26/a-victory-for-software-preservation-dmca-exemption-granted-for-spn/<br>
-
-"Exemption to Prohibition on Circumvention of Copyright Protection Systems for Access Control Technologies"<br>
-https://www.govinfo.gov/content/pkg/FR-2018-10-26/pdf/2018-23241.pdf<br>
+Additional text relevant to our pseudo-legal opinion on this document, and any accompanying digital artifacts resulting from our research work, can be found in the ["legal"](https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/legal) directory of this repository.<br>
 
 Please note that the following text is considered ["for purposes of good-faith security research"](https://www.ftc.gov/news-events/blogs/techftc/2016/10/dmca-security-research-exemption-consumer-devices). This write up will give you all the knowledge, and access you need to backup and preserve your Genesis MegaDrive Paprium cart as supplied by Watermelon Games. It will also serve as an academic tome on the security ramification of Voltage Glitching the STM32F4 MCU, FPGA security through obscurity, physical protection methods, and anti tamper techniques.<br>
-
-President Joe Biden’s latest executive order is a huge win for right to repair because it specifically calls out "unfair anticompetitive restrictions on third-party repair or self-repair of items", just like the DT128M16VA1LT concept in Paprium imposes on any end user lucky enough to acutally obtain the game. 
-https://www.whitehouse.gov/briefing-room/presidential-actions/2021/07/09/executive-order-on-promoting-competition-in-the-american-economy/<br>
 
 # Project Little Man 
 This project details the active efforts to dump the contents of the Watermelon Games Paprium cart, and understand the logic that allows the cart to function.<br>
@@ -67,58 +46,59 @@ The [Paprium Press Release](http://www.paprium.com/press/?language=en) from 03/1
 
 [![Paprium launch](http://img.youtube.com/vi/f3CTqTzkgZQ/0.jpg)](https://www.youtube.com/watch?v=f3CTqTzkgZQ)<br>
 
-The goal of this project is to empower Paprium cart owners to ensure that their investment is protected well into the future. Design flaws such as BGA voiding in the cartridge manufacturing process make it succeptible to failure. It is literally a ticking timebomb, and it will likely fail eventually.<br>
+The goal of this project is to empower Paprium cart owners to ensure that their investment is protected well into the future. Design flaws such as BGA voiding in the cartridge manufacturing process make it susceptible to failure. It is literally a ticking timebomb, and it will likely fail eventually.<br>
 
-Since Project Little Man has been released, Paprium now has a new KickStarter, seemingly selling old assets that the company refused to give to existing customers for various reasons.<br>
-https://www.kickstarter.com/projects/573261866/paprium-the-16-bit-beat-them-all-coming-to-the-next-gen/faqs<br>
+Since Project Little Man has been released, [Paprium now has a new KickStarter](https://www.kickstarter.com/projects/573261866/paprium-the-16-bit-beat-them-all-coming-to-the-next-gen/faqs), seemingly selling old assets that the company refused to provide to existing customers for various reasons.<br>
 
 ## Current Progress
-Update: 10/25/21<br>
-- Intel 10M02 (10M04 dev board acquired, waiting on USB Blaster programmer)<br>
-- STM32F4 (custom SWD breakout PCB back from fab, requires repair of small bugs)<br>
+[![Paprium in Mame](http://img.youtube.com/vi/gcilDVdup9k/3.jpg)](https://mega.nz/file/kIQBTSYI#6NoAHrU2w-mD2k625aEUcIbI9tSj4nU7j5uOYTUavYo)<br>Click the thumbnail to see Paprium running in MAME.<br>
+
+Update: 11/30/21<br>
+- Intel 10M02 (10M04 dev board & USB Blaster arrived, not used yet)<br>
+- STM32F4 (custom SWD breakout PCB version 2 back from fab with bug fixes)<br>
 - 24C64WP EEprom (dumped)<br>
-- Spansion GL064N Series Flash (dumped)<br>
+- Spansion GL064N Series Flash ([dumped](https://archive.org/details/s-29-gl-064-n-90-bfi-03-bga-48-20210924-142237-paprium-us))<br>
+- Game Strings have been extracted<br>
 - Game Audio has been extracted<br>
 - Game 4Bpp & Palate images have been extracted<br>
-- Game Strings have been extracted<br>
-- Sprite Sheets! <br>
+- Sprite Sheets have been extracted<br>
 - Sprite animation sequences extracted<br>
+- Confirmed character "inspiration", in some cases egregious<br>
+- Confirmed reused game assets from 3rd parties are present<br>
+- STM32F4 basic operation emulated in MAME<br>
+- Game boots & plays in MAME (no sound due to STM32)<br>
+- DMCA threats from Watermelon Games (achievement unlocked)
+- Hoes mad! 
 
-https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/ChipDumps/RT809H/S29GL064N90BFI03%40BGA48_20210924_142237_DECODED.BIN<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/ChipDumps/RT809H/24_64_1.8V_20210924_215810_goodcart.BIN<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/Extracted/audio/AllSoundsDirty.wav<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/Extracted/strings/gametext.txt<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/tree/main/Extracted/4BPP_bmp<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/tree/main/Extracted/sprites<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/tree/main/Extracted/anim/frames<br>
 
-### The lines between reference and inspiration, and swiping and plagiarism can be murky
+### Paprium CSI
+As a result of our reverse engineering work there is now plenty of visual data that can be academically examined in order to determine whether there is any truth in the original plagiarism claims. Kenshiro vs Stalone is often cited by Paprium art director Luis Martins as a landmark example of inspiration vs plagiarism. Dive into [CSI Paprium](https://github.com/ArcadeHustle/CSI-Paprium) to learn more, while keeping in mind that the lead art director has already had a run in with stolen art.<br>
 
-There has been a long raging debate about how much of the Paprium content is "stolen", vs an "homage", or "inspired by" other games. There is now plenty of animation data to examine to academically determine if there is any truth to this claim. Kenshiro vs Stalone is often cited by Paprium art director Luis Martins as a landmark example of inspiration vs piracy.<br> 
+<center><img src="https://github.com/ArcadeHustle/CSI-Paprium/raw/main/Evidence/ShowtimeVsSamson/140191987-a14d788c-1665-4394-851f-ca373b11f1a2.png" width="512" height="256"></center>
 
-Per fair use guidelines the animation frames are shared for the purposes of "such as criticism, comment, news reporting, teaching, scholarship, and research".<br>
-https://www.copyright.gov/fair-use/more-info.html
+[Chrono Resurrection](https://en.wikipedia.org/wiki/Chrono_Resurrection)<br>
+"Artist(s)	Luis Martins"
+
+[Re: Infringement of “CHRONO TRIGGER” trademarks and copyrights](https://web.archive.org/web/20080616071429/http://www.chillingeffects.org/derivative/notice.cgi?NoticeID=1416)<br>
+"We understand that you are developing “Chrono Trigger: Resurrection”, a 3D remake of our client’s “CHRONO TRIGGER” game which will recreate scenes from the original game. Your conduct in this regard constitutes copyright infringement and, inter alia, violates our client’s exclusive right to prepare derivative works based on its copyrighted work. Your use of the words “CHRONO TRIGGER” in connection with your “remake” and on your web site “opcoder.com”, and your use of logos, scenes, characters and other images associated with our client’s games, constitutes trademark and copyright infringement and false designation of origin.<br>
+
+Accordingly, demand is hereby made that you immediately cease and desist from further development, promotion, sale or distribution of any product which is based on or derived from our client’s “CHRONO TRIGGER” games, and that you cease and desist from all use of the “CHRONO TRIGGER” trademark and logo, and all use of images or artwork from “CHRONO TRIGGER” games."<br>
+
+[Video Games and Intellectual Property: Chrono Trigger Fan Remakes and Copyright Protection](http://mttlr.org/2012/09/video-games-and-intellectual-property-chrono-trigger-fan-remakes-and-copyright-protection/)<br>
+"These first two were notable in that Square Enix, owner of the copyrights and trademarks related to Chrono Trigger, sent cease-and-desist letters to the developers of these games claiming trademark and copyright infringement."
+
+At the very least there is confirmed stolen IP for [Sega Golden Axe](https://github.com/ArcadeHustle/CSI-Paprium#golden-axe-tribute), and [Sega Streets of Rage](https://github.com/ArcadeHustle/CSI-Paprium#streets-of-rage-inner-city-tribute). These stolen assets in essence make Paprium a "mash-up".
 
 <p align="center">
-<img src="https://arcadehustle.github.io/WatermelonPapriumDump/Extracted/anim/inspiration1.png">
-</p>
-<p align="center">
-<img src="https://arcadehustle.github.io/WatermelonPapriumDump/Extracted/anim/inspiration2.png">
-<img src="https://arcadehustle.github.io/WatermelonPapriumDump/Extracted/anim/inspiration3.png">
+<img src="https://github.com/ArcadeHustle/CSI-Paprium/raw/main/Evidence/SORInnerCityTribute/innercity1.jpg" width="240" height="180">
+<img src="https://github.com/ArcadeHustle/CSI-Paprium/raw/main/Evidence/GoldenAxeTribute/deadframe2.jpg" width="240" height="180">
 </p>
 
-Code Kitty nailed it with "To be this good takes AGES"<br>
-<p align="center">
-<img src="https://arcadehustle.github.io/WatermelonPapriumDump/Extracted/anim/inspiration4.jpeg">
-</p>
+### Paprium Codes!
+An additional benefit of the reverse engineering work is the exposure of codes used in the game to influence behavior of the running cartridge. Our codes were in fact released before they were shared on Kickstarter. The entire list of known codes is shown below.<br>
 
-Without question Luis Martins words frame the discussion: "Most of the character designs inspiration came from watching all kinds of cyberpunk anime and from playing tons of great beat em ups from the 90’s."<br>
-https://www.arcadeattack.co.uk/luis-martins-paprium/
+[3 Players CO-OP unlocked!](https://www.kickstarter.com/projects/573261866/paprium-the-16-bit-beat-them-all-coming-to-the-next-gen/posts/3344785)
 
-In tweets that have now been deleted Luis stated that "a animator" before him was responsible for the Paprium artwork, and he only touched it up.<br> 
-
-###
-Paprium Codes!
 ```
 Enable 3P mode: 
 on map screen before character select.
@@ -160,24 +140,20 @@ pause game
 A B A B A B
 ```
 
-## DATENMEISTER DT128M16VA1LT
-The DT128M16VA1LT is supposedly a "custom" chip made by [Daten Semiconductor](https://web.archive.org/web/20190706065046/http://datensemi.com/), that is really just a bunch of commodity parts covered in black [epoxy glob top encapsulant](https://www.youtube.com/watch?v=dRsl4c6NM8U). Never mind that it has been proven that ["Datenmeister DT128M16VA1LT chipset is fake"](https://papriumfiasco.wordpress.com/tag/datenmeister/), or that the website of the company that "makes" it, was originally registered to Fonzie.<br>
-<img src="https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/datenwhois.png"><br>
+## Further exposure of the fake Datenmeister DT128M16VA1LT
+In an amazing feat of false advertising, Gwénaël Godde completely manufactured from thin air, the concept that he'd created a new SoC. The DT128M16VA1LT is supposedly a "custom" chip made by [Daten Semiconductor](https://web.archive.org/web/20190706065046/http://datensemi.com/), that is really just a bunch of commodity parts covered in black [epoxy glob top encapsulant](https://www.youtube.com/watch?v=dRsl4c6NM8U). Never mind that it has been proven that ["Datenmeister DT128M16VA1LT chipset is fake"](https://papriumfiasco.wordpress.com/tag/datenmeister/), or that the website of the company that "makes" it, was originally registered to Fonzie.<br>
+<img src="https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/datenwhois.png">
+<br>
 
-The Datenmeister serves as the central piece of technology driving the Paprium cart. The only problem is, that it does not exist, at all. In reality, it is just handful of common components.<br>
-https://twitter.com/MyLifeInGaming/status/1341092115250630656
+The Datenmeister serves as the central piece of technology driving the Paprium cart. The only problem is, [that it does not exist](https://twitter.com/MyLifeInGaming/status/1341092115250630656), at all. In reality, it is just handful of common components.<br>
 
 Any Paprium ROM archival efforts would have to revolve around exploiting weaknesses in the "DT128M16VA1LT" components.
 
 ### DT128M16VA1LT parts related to data storage, and game logic. 
-The actual technology in the ficticious "DT128M16VA1LT" from the Paprium cart is made up of known ICs that are succeptable to known weaknesses, and potential attacks. Being beneath black goop does not at all make the chips impervious to attack.<br>
+The actual technology in the ficticious "DT128M16VA1LT" from the Paprium cart is made up of known ICs that are succeptable to known weaknesses, and potential attacks. Being beneath black goop does not at all make the chips impervious to attack. It should in practice be trivial to interface with each of the major componets. The primary hurdle, and barrier to entry is physical access to each component, or it's pin/ballout. Due to the black epoxy these components must be carefully excavated.  
 
-It should in practice be trivial to interface with each of the major componets. The major hurdle right now is physical access to each component, or it's pinout due to the black epoxy.  
-
-#### Intel® MAX 10 FPGAs
-Altera 10M02SCU169C8G FPGA (UBGA169)<br>
-https://www.mouser.com/datasheet/2/612/m10_overview-2401081.pdf<br>
-https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/an/an556.pdf
+#### Intel® MAX 10 FPGA
+[Altera](https://www.intel.com/content/dam/www/programmable/us/en/pdfs/literature/an/an556.pdf) [10M02SCU169C8G](https://www.mouser.com/datasheet/2/612/m10_overview-2401081.pdf) FPGA (UBGA169)<br>
 
 The Intel "10M02" FPGA on the Paprium cart ["may allow an authenticated user to potentially enable escalation of privilege and information disclosure via physical access"](https://www.intel.com/content/www/us/en/security-center/advisory/intel-sa-00349.html). The vulnerability has been assigned [CVE-2020-0574](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-0574). Dr. Sergei Skorobogatov of the Dept of Computer Science and Technology, University of Cambridge, Cambridge, UK, has been credited with reporting this issue. His papers and persentations on the subject are linked below:<br> 
 https://arxiv.org/abs/1910.05086<br>
@@ -200,11 +176,10 @@ Sergei's research outlines several weaknesses that can aid in archival of Papriu
 All of these vulnerabilities can in theory be used to dump the FPGA that is present on the Paprium cartridge. Although the bitstream can not be easily reverse engineered, it could absolutly be used in a remanufactured cart, assuming it plays some role in security, or audio and GFX rendering<br>
 
 #### STM32F4
-ST STM32F446ZEJ6 MCU (UFBGA144)<br>
-https://www.st.com/resource/en/datasheet/stm32f446re.pdf<br>
-https://www.st.com/resource/en/application_note/dm00493651-introduction-to-stm32-microcontrollers-security-stmicroelectronics.pdf<br>
+[ST](https://www.st.com/resource/en/application_note/dm00493651-introduction-to-stm32-microcontrollers-security-stmicroelectronics.pdf) [STM32F446ZEJ6](https://www.st.com/resource/en/datasheet/stm32f446re.pdf) MCU (UFBGA144)<br>
 
-Assuming that the STM32 is making use of RDP based protection it will require some special conditions in order to dump the firmware. If it is on the otherhand not protected, a physical connection to the SWD pins will be all that is needed. Once freed from the black epoxy, the chip is more succeptable to examination, and attack.<br> 
+
+Assuming that the STM32 is making use of RDP based protection it will require some special conditions in order to dump the firmware. If it is on the other hand not protected, a physical connection to the SWD pins will be all that is needed. Once freed from the black epoxy, the chip is more susceptible to examination, and attack.<br> 
 
 Similar to the Intel FPGA, the STM32F4 inside the Paprium cart is known to be vulnerable to voltage glitching attacks that should aid in archival of Paprium's data. The attacks have moved from theory, and manual one off demonstrations to now being available in ready made productized form with tools like [ChipWhisperer](https://www.newae.com/chipwhisperer). Various exploitation demonstrations have occured outside common lab constraints, and SDK kit based testing.<br>
 
@@ -218,46 +193,34 @@ https://blog.kraken.com/post/3662/kraken-identifies-critical-flaw-in-trezor-hard
 https://twitter.com/The_Hpman/status/1383191393393389570<br>
 https://twitter.com/The_Hpman/status/1383191380743356416<br>
 
-Commerical RE company [BreakIC](http://www.break-ic.com) aka Mikatech will dump the STM32 for a fee of $6500 USD, claiming that "The tools needed to read it costs USD2million". We have reliably used Mikatech in the past for less costly extractions, and originally found them because their marketing claims that they are "World first mcu cloning company". Worst case scenario, we could in theory pay to have the Paprium STM32 chip dumped via their expensive machine.<br>
+Commercial RE company [BreakIC](http://www.break-ic.com) aka Mikatech will dump the STM32 for a fee of $6500 USD, claiming that "The tools needed to read it costs USD2million". We have reliably used Mikatech in the past for less costly extractions, and originally found them because their marketing claims that they are "World first mcu cloning company". Worst case scenario, we could in theory pay to have the Paprium STM32 chip dumped via their expensive machine.<br>
 
 <img src="https://arcadehustle.github.io/WatermelonPapriumDump/images/breakIC.jpg">
 
-Alternatively practicing on [STM32F4 dev boards](https://www.st.com/en/evaluation-tools/nucleo-f446re.html) using a standard ChipWhisperer setup should set the stage for dumping the Paprium STM32F4 using standard community accessible tools. Again, assuming there is RDP protection enabled at all!<br>
-
-Similarly starting with the standard [STM43F4 "UFO" target board](https://store.newae.com/stm32f4-target-for-cw308-arm-cortex-m4-1mb-flash-192kb-sram) is a great way to practice before moving on attempting to attack the Paprium cart.<br>
+Alternatively practicing on [STM32F4 dev boards](https://www.st.com/en/evaluation-tools/nucleo-f446re.html) using a standard ChipWhisperer setup should set the stage for dumping the Paprium STM32F4 using standard community accessible tools. Similarly starting with the standard [STM43F4 "UFO" target board](https://store.newae.com/stm32f4-target-for-cw308-arm-cortex-m4-1mb-flash-192kb-sram) is a great way to practice before moving on attempting to attack the Paprium cart. Again, assuming there is RDP protection enabled at all!<br>
 
 ### MirrorBit Flash
-Spansion GL064N Series Flash (BGA48)<br>
-https://www.cypress.com/file/202426/download<br>
+[Spansion GL064N Series Flash (BGA48)](https://www.cypress.com/file/202426/download)<br>
 
-Reading the Spansion flash is confirmed to be possible with a standard Universal Programmer, and the appropriate adapter. Your adapter must also support the flash algorithm. We had to purchase an RT809H for example, because our Top3000 did not properly support reading the chip. 
-https://www.aliexpress.com/item/32820731419.html<br>
-https://www.aliexpress.com/item/32978614065.html<br>
+
+Reading the Spansion flash is confirmed to be possible with a standard Universal Programmer, and the appropriate adapter. Your adapter must also support the proper flash algorithm, or your reads will be garbage. We had to purchase an [RT809H](https://www.aliexpress.com/item/32978614065.html) and a [BGA48 adapter](https://www.aliexpress.com/item/32820731419.html) for example, because our Top3000 did not properly support reading the chip. <br>
 
 You can see from the chip routing that the Flash data access for the running cart is gatekept by the FPGA.<br>
 <img src="https://arcadehustle.github.io/WatermelonPapriumDump/images/flashdatalines.jpg">
 
 ### i2c EEPROM
-24C64WP EEprom (SO8)<br>
-https://www.st.com/resource/en/datasheet/m24c64-f.pdf<br>
+[24C64WP EEprom (SO8)](https://www.st.com/resource/en/datasheet/m24c64-f.pdf)<br>
 
 Similarly reading the i2c EEPROM is confirmed possible with standard EEPROM readers, or even an [Arduino](https://learn.sparkfun.com/tutorials/reading-and-writing-serial-eeproms/all). It is sitting outside the black epoxy, making it easy to examine. 
 <img src="https://arcadehustle.github.io/WatermelonPapriumDump/images/exposedi2cflash.jpg">
-Example dumps can be found here:<br>
-https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/ChipDumps/RT809H/24_64_1.8V_20210924_215810_goodcart.BIN
-https://github.com/ArcadeHustle/WatermelonPapriumDump/blob/main/ChipDumps/RT809H/24_64_1.8V_20210924_220101_badcart.BIN
 
 You can read the chip in place on the cart without removing it by using a pogo reader. 
 https://www.ebay.com/itm/324696874863
 
-## Useful tools
-The standard tool for voltage glitching is the Chip Whisperer, STM32 is a default target in the "level 1" kit, so this seems like a natural fit for anyone wanting to play along:<br>
-https://store.newae.com/side-channel-glitching-starter-pack-level-1/<br>
-https://www.mouser.com/new/newae-technology/newae-chipwhisperer-lite-l1-kit/<br>
+## Useful information & tools
+The standard tool for voltage glitching is the [Chip Whisperer](https://store.newae.com/side-channel-glitching-starter-pack-level-1/), STM32 is a default target in the ["level 1" kit](https://www.mouser.com/new/newae-technology/newae-chipwhisperer-lite-l1-kit), so this seems like a natural fit for anyone wanting to play along:<br>
 
-Before the ChipWisperer came along you often saw [FeelTech FY3200S](https://www.ebay.com/itm/402781810775) used in academic papers about voltage glitching STM32 MCUs. This device contains a USB API that can be used to script voltage changes. A [Python API](https://github.com/atx/python-feeltech) makes scripting easy.<br>
-
-Keeping in mind of course that these tools may only be necessary if RDP protection is enabled on the STM32F4.<br>
+Before the ChipWisperer came along you often saw [FeelTech FY3200S](https://www.ebay.com/itm/402781810775) used in academic papers about voltage glitching STM32 MCUs. This device contains a USB API that can be used to script voltage changes. A [Python API](https://github.com/atx/python-feeltech) makes scripting easy. Keeping in mind of course that these tools may only be necessary if RDP protection is enabled on the STM32F4.<br>
 
 ### Cart Specific detail
 The Paprium cart is a special unicorn. If you don't pay attention, you may perhaps miss some notable "features".<br>
@@ -426,6 +389,8 @@ Fonzie: "The final state of testing we modified something on the game, but we co
 </a>
 
 ### Support situation
+Per the [press release](https://www.paprium.com/press/) "Anyone pissed about lack of support, well, we cut out all our cost so the game can ever release. And the game is there, that's all [that] matters."<br>
+
 https://twitter.com/Scene_World interview with https://twitter.com/watermelongames<br>
 https://twitter.com/Scene_World/status/1445178396988874754<br>
 
